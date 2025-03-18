@@ -1,0 +1,50 @@
+# .gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+venv/
+env/
+*.venv
+.env
+.env.local
+*.sqlite
+*.log
+*.pot
+*.pyc
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+dist/
+build/
+.cache/
+.parcel-cache/
+
+# Jupyter/Data
+.ipynb_checkpoints/
+*.ipynb
+data/raw/  # Exclude raw data (going to keep scripts in /data)
+*.fits     # Large astronomical data files (host somewhere else)
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# AWS/GCP
+credentials.json
+*.key
