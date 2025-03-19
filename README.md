@@ -9,8 +9,8 @@
 
 ## 🎯 Goals
 - Train a neural network to map dark matter using SDSS/DES data.
-- Build an interactive 3D visualization tool for researchers.
-- Compare AI predictions with traditional gravitational lensing methods.
+- Build an interactive 3D visualization tool for researchers (or curious people).
+- Possibly compare my results with more traditional methods.
 
 ## 🛠 Tech Stack
 - **AI/Backend**: Python, PyTorch, FastAPI, AstroPy
@@ -19,8 +19,6 @@
 
 ## 🚀 Features
 - 3D volumetric rendering of dark matter.
-- Side-by-side comparison with visible matter.
-- Real-time model inference via FastAPI.
 
 ## 📦 Installation
 ```bash
