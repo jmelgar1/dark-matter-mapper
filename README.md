@@ -1,4 +1,4 @@
-# 🌌 Dark Matter Mapper with Neural Networks
+# 🌌 Dark Matter Mapper with a Convolutional Neural Network
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Python](https://img.shields.io/badge/Python-3.9%2B-blue)](https://python.org)
