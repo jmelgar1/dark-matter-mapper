@@ -17,7 +17,7 @@ env/
 .coverage
 htmlcov/
 .pytest_cache/
-placeholder_weights.pth
+weights.pth
 
 # Node.js
 node_modules/
