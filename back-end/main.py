@@ -1,9 +1,12 @@
 import torch
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
-from data.sdss_client import fetch_sdss_galaxies, preprocess_to_3d_voxels
-from ml.model import DarkMatter3DCNN
+from src.main.sdss.sdss_client import fetch_sdss_galaxies, preprocess_to_3d_voxels
+from src.main.ml.model import DarkMatter3DCNN
+from src.main.objects.prediction_request import PredictionRequest
 
 app = FastAPI(
     title="Dark Matter Mapper API",
@@ -19,10 +22,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+
 try:
     model = DarkMatter3DCNN()
     # set placeholder weights until training is implemented
-    model.load_state_dict(torch.load("ml/placeholder_weights.pth", map_location=torch.device('cpu')))
+    model.load_state_dict(torch.load("src/main/ml/placeholder_weights.pth", map_location=torch.device('cpu')))
 except Exception as e:
     raise RuntimeError(f"Model initialization failed: {str(e)}")
 
@@ -33,19 +39,20 @@ async def health_check():
 
 
 @app.post("/predict")
-async def predict_dark_matter(ra_min: float, ra_max: float, dec_min: float, dec_max: float):
+@limiter.limit("10/minute")
+async def predict_dark_matter(request: PredictionRequest):
     try:
         # fetch galaxies - add validation
-        if not (-90 <= dec_min <= 90) or not (-90 <= dec_max <= 90):
+        if not (-90 <= request.dec_min <= 90) or not (-90 <= request.dec_max <= 90):
             raise HTTPException(status_code=400, detail="Dec must be between -90 and 90")
 
-        galaxies = fetch_sdss_galaxies(ra_min, ra_max, dec_min, dec_max)
+        galaxies = fetch_sdss_galaxies(request.ra_min, request.ra_max, request.dec_min, request.dec_max)
 
         #ad channel dimension and normalize
         voxel_grid = preprocess_to_3d_voxels(galaxies)
         input_tensor = torch.tensor(voxel_grid).unsqueeze(0).unsqueeze(0).float()  # Shape: [batch, channel, depth, height, width]
 
-        # add model validation
+        # add voxel grid validation
         if input_tensor.shape[-3:] != (50, 50, 50):
             raise HTTPException(status_code=422, detail="Invalid voxel grid dimensions")
 
