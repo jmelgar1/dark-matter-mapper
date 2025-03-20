@@ -41,21 +41,27 @@ async def predict_dark_matter(ra_min: float, ra_max: float, dec_min: float, dec_
 
         galaxies = fetch_sdss_galaxies(ra_min, ra_max, dec_min, dec_max)
 
-        # Add channel dimension and normalize
+        #ad channel dimension and normalize
         voxel_grid = preprocess_to_3d_voxels(galaxies)
         input_tensor = torch.tensor(voxel_grid).unsqueeze(0).unsqueeze(0).float()  # Shape: [batch, channel, depth, height, width]
 
-        # Add model validation
+        # add model validation
         if input_tensor.shape[-3:] != (50, 50, 50):
             raise HTTPException(status_code=422, detail="Invalid voxel grid dimensions")
 
+        # Get prediction
         with torch.no_grad():
-            prediction = model(input_tensor).numpy()
+            prediction_tensor = model(input_tensor)
+            prediction_np = prediction_tensor.numpy()
+            prediction_shape = prediction_np.shape
+
+        # convert sample value to Python float
+        prediction_sample = float(prediction_np[0, 0, 0, 0, 0])
 
         return {
             "status": "success",
-            "prediction_shape": prediction.shape,
-            "prediction_sample": prediction[0, 0, 0, 0, 0]  # Return sample value
+            "prediction_shape": list(prediction_shape),
+            "prediction_sample": prediction_sample
         }
 
     except HTTPException as he:

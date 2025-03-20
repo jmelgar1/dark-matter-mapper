@@ -6,7 +6,7 @@ import pandas as pd
 from astropy import coordinates as coords
 from astropy import units as u
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 def fetch_sdss_galaxies(
@@ -20,7 +20,6 @@ def fetch_sdss_galaxies(
     """
     Fetch galaxy data from SDSS DR17 within specified coordinates.
     """
-    # Validate parameters
     if not (0 <= ra_min <= 360) or not (0 <= ra_max <= 360):
         raise ValueError("RA must be between 0 and 360 degrees")
     if not (-90 <= dec_min <= 90) or not (-90 <= dec_max <= 90):
@@ -30,7 +29,6 @@ def fetch_sdss_galaxies(
     if dec_min >= dec_max:
         raise ValueError("dec_min must be less than dec_max")
 
-    # Build query
     query = f"""
       SELECT TOP {max_galaxies}
           p.ra, p.dec, s.z as redshift,
@@ -48,7 +46,6 @@ def fetch_sdss_galaxies(
     logger.debug(f"SDSS Query:\n{query}")
 
     try:
-        # Use params instead of data for proper encoding
         response = requests.post(
             "https://skyserver.sdss.org/dr17/SkyServerWS/SearchTools/SqlSearch",
             params={
@@ -62,7 +59,6 @@ def fetch_sdss_galaxies(
             timeout=30
         )
 
-        # Add debug logging for raw response
         logger.debug(f"Response status: {response.status_code}")
         logger.debug(f"Response content: {response.text[:500]}")
 
@@ -70,14 +66,28 @@ def fetch_sdss_galaxies(
 
         data = response.json()
 
-        if not data or "Rows" not in data:
+        logger.debug(f"Response structure: {data}")
+
+        # check if the response contains valid data
+        if not data or not isinstance(data, list) or len(data) == 0:
             logger.warning("No galaxies found in this region")
             return pd.DataFrame()
 
-        df = pd.DataFrame(data["Rows"])
+        # Extract rows from the response
+        rows = data[0].get("Rows", [])  # Access the first table's rows
+
+        if not rows:
+            logger.warning("No galaxies found in this region")
+            return pd.DataFrame()
+
+        # Create DataFrame directly from the rows
+        df = pd.DataFrame(rows)
 
         if df.empty:
+            logger.warning("No galaxies found in this region")
             return pd.DataFrame()
+
+        logger.debug(f"DataFrame columns: {df.columns}")
 
         # Convert magnitudes to numeric
         for band in ['mag_g', 'mag_r', 'mag_i']:
@@ -95,11 +105,15 @@ def fetch_sdss_galaxies(
 
 def preprocess_to_3d_voxels(df, voxel_size=50):
     """Convert galaxy positions to 3D voxel grid."""
+
+    if not all(col in df.columns for col in ['ra', 'dec', 'redshift']):
+        raise ValueError("DataFrame must contain 'ra', 'dec', and 'redshift' columns")
+
     # Convert RA/dec/redshift to Cartesian coordinates
     sky_coords = coords.SkyCoord(
-        ra=df['ra'] * u.degree,
-        dec=df['dec'] * u.degree,
-        distance=df['redshift'] * u.Mpc, #redshift is treated as distance (not really but kinda)
+        ra=df['ra'].values * u.degree,
+        dec=df['dec'].values * u.degree,
+        distance=df['redshift'].values * u.Mpc, #redshift is treated as distance (not really but kinda)
         frame='icrs'
     )
 
