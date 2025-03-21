@@ -1,0 +1,46 @@
+.canvas-container {
+  width: 100vw;
+  height: 70vh;
+  background: #0a0a0a;
+}
+
+.controls-form {
+  padding: 2rem;
+  background: #1a1a1a;
+  border-radius: 8px;
+  margin: 2rem auto;
+  max-width: 600px;
+}
+
+.input-group {
+  margin: 1rem 0;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #5786F5;
+}
+
+.input-group input {
+  width: 48%;
+  padding: 0.5rem;
+  margin-right: 1%;
+  background: #333;
+  border: 1px solid #444;
+  color: white;
+}
+
+button {
+  background: #5786F5;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
