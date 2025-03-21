@@ -1,38 +1,38 @@
-import torch
 import torch.nn as nn
 
 
 class DarkMatter3DCNN(nn.Module):
-    def __init__(self, input_shape=(50, 50, 50)):
+    def __init__(self):
         super().__init__()
 
-        #Here we have two layers of Convolution and pooling. If we only had one we would miss out on
-        #the big picture which is critical for dark matter. We would be able to detect clusters and groups
-        #of galaxies but miss out on large scale structures.
-        self.conv_layers = nn.Sequential(
-            # Layer 1: Detect small-scale galaxy patterns
-            nn.Conv3d(1, 16, kernel_size=3, padding=1),
-            nn.ReLU(),
-            nn.MaxPool3d(2),
+        self.encoder = nn.Sequential(
+            nn.Conv3d(1, 32, 3, padding=1),
+            nn.BatchNorm3d(32),
+            nn.LeakyReLU(0.1),
+            nn.MaxPool3d(2),  # 25x25x25
 
-            # Layer 2: Detect large-scale galaxy patterns
-            nn.Conv3d(16, 32, kernel_size=3, padding=1),
-            nn.ReLU(),
-            nn.MaxPool3d(2),
-            nn.Flatten()
+            nn.Conv3d(32, 64, 3, padding=1),
+            nn.BatchNorm3d(64),
+            nn.LeakyReLU(0.1),
         )
 
-        # calculate flattened size after convolutions
-        with torch.no_grad():
-            dummy = torch.zeros(1, 1, *input_shape)
-            flattened_size = self.conv_layers(dummy).shape[1]
+        self.decoder = nn.Sequential(
+            nn.ConvTranspose3d(64, 32, 3, stride=2, padding=1, output_padding=1),
+            nn.BatchNorm3d(32),
+            nn.LeakyReLU(0.1),
 
-        self.fc = nn.Sequential(
-            nn.Linear(flattened_size, 128),
-            nn.ReLU(),
-            nn.Linear(128, input_shape[0] * input_shape[1] * input_shape[2])  # Predict voxel grid
+            # added an additional layer to reach 50x50x50
+            nn.Conv3d(32, 32, 3, padding=1),
+            nn.BatchNorm3d(32),
+            nn.LeakyReLU(0.1),
+
+            nn.Conv3d(32, 1, 3, padding=1),
+            nn.Tanh()
         )
 
     def forward(self, x):
-        x = self.conv_layers(x)
-        return self.fc(x).view(-1, 1, 50, 50, 50)  # Reshape to 3D
+        x = self.encoder(x)
+        x = self.decoder(x)
+        if x.shape[-3:] != (50, 50, 50):
+            raise ValueError(f"Invalid output shape: {x.shape}")
+        return x

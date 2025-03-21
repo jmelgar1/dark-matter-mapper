@@ -9,7 +9,10 @@ export default function App() {
   return (
       <div className="app">
         <h1>Dark Matter 3D Mapper</h1>
-        <ControlsForm onPredict={(data) => setVoxelData(data.prediction)} />
+          <ControlsForm onPredict={(data) => {
+              console.log("API Response:", data);
+              setVoxelData(data.prediction_3d);
+          }} />
         <GalaxyPlot voxelData={voxelData} />
       </div>
   );
