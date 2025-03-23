@@ -4,16 +4,15 @@ import GalaxyPlot from '../components/GalaxyPlot';
 import './App.css';
 
 export default function App() {
-  const [voxelData, setVoxelData] = useState<number[][][] | null>(null);
+    const [voxelData, setVoxelData] = useState<number[][][] | null>(null);
 
-  return (
-      <div className="app">
-        <h1>Dark Matter 3D Mapper</h1>
-          <ControlsForm onPredict={(data) => {
-              console.log("API Response:", data);
-              setVoxelData(data.prediction_3d);
-          }} />
-        <GalaxyPlot voxelData={voxelData} />
-      </div>
-  );
+    return (
+        <div className="app">
+            <GalaxyPlot voxelData={voxelData} />
+            <ControlsForm onPredict={(data) => {
+                console.log("API Response:", data);
+                setVoxelData(data.prediction_3d);
+            }} />
+        </div>
+    );
 }

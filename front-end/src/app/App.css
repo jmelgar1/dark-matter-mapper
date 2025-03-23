@@ -1,15 +1,28 @@
 .canvas-container {
   width: 100vw;
-  height: 70vh;
+  height: 100vh;
   background: #0a0a0a;
 }
 
+.app {
+  position: relative;
+}
+
 .controls-form {
-  padding: 2rem;
-  background: #1a1a1a;
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 1;
+  padding: 1rem;
+  background: rgba(26, 26, 26, 0.9);
   border-radius: 8px;
-  margin: 2rem auto;
-  max-width: 600px;
+  max-width: 300px;
+}
+
+.controls-form h2 {
+  margin: 0 0 1rem 0;
+  color: #5786F5;
+  font-size: 1.2rem;
 }
 
 .input-group {

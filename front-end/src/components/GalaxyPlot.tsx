@@ -19,7 +19,6 @@ export default function GalaxyPlot({ voxelData }: {
         const colors: number[] = [];
         const size = voxelData.length;
 
-        // Calculate absolute value range
         const allValues = voxelData.flat(2);
         const absMax = Math.max(...allValues.map(Math.abs));
         const minVal = Math.min(...allValues);

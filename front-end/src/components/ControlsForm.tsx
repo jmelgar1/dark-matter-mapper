@@ -28,6 +28,7 @@ export default function ControlsForm({ onPredict }: {
 
     return (
         <form onSubmit={handleSubmit} className="controls-form">
+            <h2>Dark Matter 3D Mapper</h2>
             <div className="input-group">
                 <label>RA Min/Max (0-360)</label>
                 <input type="number" value={raMin} onChange={(e) => setRaMin(e.target.value)} step="0.1" />
