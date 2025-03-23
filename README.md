@@ -30,3 +30,5 @@ cd backend && pip install -r requirements.txt
 
 # Install frontend dependencies
 cd ../frontend && npm install
+```
+![image](https://github.com/user-attachments/assets/25ed9783-c5c1-4806-8aa9-27abb9c05968)
