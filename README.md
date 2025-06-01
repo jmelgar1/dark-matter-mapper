@@ -22,7 +22,7 @@
 ## 📦 Installation
 ```bash
 # Clone the repo
-git clone https://github.com/<username>/dark-matter-mapper.git
+git clone https://github.com/jmelgar1/dark-matter-mapper.git
 cd dark-matter-mapper
 
 # Install backend dependencies
