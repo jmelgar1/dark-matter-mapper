@@ -17,7 +17,7 @@
 - **Infra**: Docker
 
 ## 🚀 Features
-- 3D volumetric rendering of dark matter.
+- 3D volumetric rendering of dark matter predictions.
 
 ## 📦 Installation
 ```bash
